@@ -1,0 +1,13 @@
+{
+  "name": "med-translator-web",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "groq-sdk": "^0.7.0",
+    "@vitalets/google-translate-api": "^9.2.0"
+  }
+}

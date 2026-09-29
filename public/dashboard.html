@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Telemetry Dashboard</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 30px auto; padding: 0 15px; background: #f7f7f8; }
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 16px 0; }
+    .kpi { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-size: 13px; color: #555; }
+    .kpi b { display: block; font-size: 22px; color: #111; }
+    canvas { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 8px; margin-bottom: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; margin-bottom: 18px; }
+    td, th { border: 1px solid #ddd; padding: 6px; text-align: left; vertical-align: top; }
+    tr.err td { background: #fdecec; }
+    .urdu { direction: rtl; text-align: right; }
+  </style>
+</head>
+<body>
+  <h2>Telemetry Dashboard</h2>
+  <a href="/index.html">&larr; Translator</a>
+  <div class="kpis" id="kpis"></div>
+
+  <canvas id="lat" height="90"></canvas>
+  <canvas id="tok" height="90"></canvas>
+  <canvas id="peak" height="90"></canvas>
+
+  <h3>Cost and time per step</h3>
+  <table id="steps"></table>
+
+  <h3>History</h3>
+  <table id="hist"></table>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Everything that comes from users or the model is escaped before it goes into innerHTML.
+const esc = (s) =>
+  String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const charts = {};
+function draw(id, config) {
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(document.getElementById(id), config);
+}
+
+async function load() {
+  const m = await (await fetch("/api/metrics")).json();
+  const h = await (await fetch("/api/history")).json();
+
+  const kpis = [
+    ["Requests", m.total],
+    ["Errors", m.errors + " (" + m.errorRate + "%)"],
+    ["Avg latency", m.avgLatencyMs + " ms"],
+    ["p50 / p95 latency", m.p50LatencyMs + " / " + m.p95LatencyMs + " ms"],
+    ["Avg tokens", m.avgTokens],
+    ["Total tokens", m.totalTokens],
+    ["Avg model calls", m.avgGroqCalls],
+    ["Safety pass", m.safetyPassRate + "%"],
+    ["Refinement rate", m.refinementRate + "%"],
+    ["User approval", m.approvalRate === null ? "n/a" : m.approvalRate + "%"],
+    ["Fallbacks used", m.groq ? m.groq.fallbacks : 0],
+    ["Rate limits hit", m.groq ? m.groq.rateLimits : 0],
+  ];
+  document.getElementById("kpis").innerHTML = kpis
+    .map(([k, v]) => `<div class="kpi">${esc(k)}<b>${esc(v)}</b></div>`).join("");
+
+  const labels = m.recent.map((r) => r.t.slice(11, 19));
+  draw("lat", {
+    type: "line",
+    data: { labels, datasets: [{ label: "Latency (ms)", data: m.recent.map((r) => r.latency) }] },
+  });
+  draw("tok", {
+    type: "line",
+    data: { labels, datasets: [{ label: "Tokens per request", data: m.recent.map((r) => r.tokens) }] },
+  });
+
+  const hours = Array.from({ length: 24 }, (_, i) => i);
+  draw("peak", {
+    type: "bar",
+    data: {
+      labels: hours,
+      datasets: [{ label: "Requests by hour of day (peak time)", data: hours.map((x) => m.byHour[x] || 0) }],
+    },
+  });
+
+  document.getElementById("steps").innerHTML =
+    "<tr><th>Step</th><th>Runs</th><th>Avg tokens</th><th>Avg latency (ms)</th><th>Total tokens</th></tr>" +
+    Object.entries(m.steps)
+      .map(([name, s]) => `<tr><td>${esc(name)}</td><td>${esc(s.count)}</td><td>${esc(s.avgTokens)}</td><td>${esc(s.avgLatencyMs)}</td><td>${esc(s.totalTokens)}</td></tr>`)
+      .join("");
+
+  document.getElementById("hist").innerHTML =
+    "<tr><th>Time</th><th>Status</th><th>Input</th><th>Translation</th><th>Steps</th><th>Feedback</th></tr>" +
+    h.map((r) => `<tr class="${r.status === "error" ? "err" : ""}">
+      <td>${esc((r.startedAt || "").slice(11, 19))}</td>
+      <td>${esc(r.status || "ok")}${r.needsReview ? " (review)" : ""}</td>
+      <td>${esc(r.input)}</td>
+      <td class="urdu">${esc(r.translation || r.error || "")}</td>
+      <td>${esc((r.steps || []).map((s) => s.step).join(" → "))}</td>
+      <td>${r.feedback ? esc((r.feedback.rating || "") + (r.feedback.glossaryEntry ? " + term" : "") + (r.feedback.correctedTranslation ? " + edit" : "")) : ""}</td>
+    </tr>`).join("");
+}
+
+load();
+setInterval(load, 15000);
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+[
+  {
+    "source": "Do not stop the medicine without consulting your doctor.",
+    "target_lang": "Urdu",
+    "reference": "اپنے ڈاکٹر سے مشورہ کیے بغیر دوا بند نہ کریں۔",
+    "direction": "English to Urdu"
+  },
+  {
+    "source": "If you have difficulty breathing, seek medical attention immediately.",
+    "target_lang": "Urdu",
+    "reference": "اگر آپ کو سانس لینے میں دشواری ہو تو فوراً طبی مدد حاصل کریں۔",
+    "direction": "English to Urdu"
+  },
+  {
+    "source": "مریض کو fever ہے",
+    "target_lang": "English",
+    "reference": "The patient has a fever.",
+    "direction": "Urdu to English"
+  },
+  {
+    "source": "Mareez ko bukhar hay.",
+    "target_lang": "English",
+    "reference": "The patient has a fever.",
+    "direction": "Roman Urdu to English"
+  }
+]

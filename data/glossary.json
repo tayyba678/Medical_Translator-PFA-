@@ -1,0 +1,29 @@
+{
+  "drug_names": [
+    { "en": "paracetamol", "ur": "پیراسیٹامول" },
+    { "en": "ibuprofen", "ur": "آئیبوپروفین" },
+    { "en": "amoxicillin", "ur": "اموکسیسلن" },
+    { "en": "insulin", "ur": "انسولین" }
+  ],
+  "symptoms": [
+    { "en": "difficulty breathing", "ur": "سانس لینے میں دشواری" },
+    { "en": "fever", "ur": "بخار", "roman_ur_variants": ["bukhar", "bukar"] },
+    { "en": "chest pain", "ur": "سینے میں درد", "roman_ur_variants": ["cheest mein dard"] },
+    { "en": "cough", "ur": "کھانسی", "roman_ur_variants": ["khansi", "khaansi"] },
+    { "en": "vomiting", "ur": "الٹی", "roman_ur_variants": ["ulti", "ulty"] },
+    { "en": "diarrhea", "ur": "دست", "roman_ur_variants": ["dast"] }
+  ],
+  "body_parts": [
+    { "en": "chest", "ur": "سینہ", "roman_ur_variants": ["seena", "cheest"] },
+    { "en": "stomach", "ur": "پیٹ", "roman_ur_variants": ["pet"] }
+  ],
+  "dosage_timing_words": [
+    { "en": "before meals", "ur": "کھانا کھانے سے پہلے" },
+    { "en": "after meals", "ur": "کھانا کھانے کے بعد" },
+    { "en": "tablet", "ur": "گولی" }
+  ],
+  "keep_english_terms": [
+    "MRI", "BP", "ICU", "API", "paracetamol", "ibuprofen", "amoxicillin",
+    "insulin", "CT scan", "X-ray"
+  ]
+}

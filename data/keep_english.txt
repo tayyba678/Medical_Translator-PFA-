@@ -1,0 +1,12 @@
+# drugs
+metformin
+atorvastatin
+# diseases
+myocardial infarction
+rheumatoid arthritis
+# tests
+HbA1c
+troponin
+# research
+randomized controlled trial
+p-value
